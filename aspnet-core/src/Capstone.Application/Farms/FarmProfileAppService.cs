@@ -17,6 +17,7 @@ namespace Capstone.Farms;
 
 public class FarmProfileDto
 {
+    [Required, RegularExpression("^[a-zA-Z][a-zA-Z0-9_-]{1,63}$", ErrorMessage = "Farm code must start with a letter and use letters, digits, '-' or '_'.")]
     public string FarmCode { get; set; }
 
     [Required, StringLength(FarmProfile.MaxFarmNameLength)]
@@ -135,6 +136,25 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         FarmAddress.Validate(input.PostalCode, input.Country);
 
         var tenantId = Farm.TenantId;
+        var tenant = await GetCurrentTenantAsync();
+        var requestedFarmCode = (input.FarmCode ?? string.Empty).Trim();
+        if (!FarmProvisioningManager.FarmCodeRegex.IsMatch(requestedFarmCode))
+        {
+            throw new UserFriendlyException("Farm code must start with a letter and use 2–64 letters, digits, '-' or '_'.");
+        }
+
+        if (!string.Equals(tenant.TenancyName, requestedFarmCode, StringComparison.OrdinalIgnoreCase))
+        {
+            var existingTenant = await TenantManager.FindByTenancyNameAsync(requestedFarmCode);
+            if (existingTenant != null && existingTenant.Id != tenant.Id)
+            {
+                throw new UserFriendlyException($"The farm code '{requestedFarmCode}' is already taken.");
+            }
+
+            tenant.TenancyName = requestedFarmCode;
+            await TenantManager.UpdateAsync(tenant);
+        }
+
         var profile = await _profiles.FirstOrDefaultAsync(x => x.Id == tenantId);
         if (profile == null)
         {
@@ -161,7 +181,6 @@ public class FarmProfileAppService : CapstoneAppServiceBase
         profile.DateOrder = Enum.IsDefined(input.DateOrder) ? input.DateOrder : FarmDateOrder.MonthFirst;
         profile.Use24HourTime = input.Use24HourTime;
 
-        var tenant = await GetCurrentTenantAsync();
         tenant.Name = profile.FarmName.Length > 128 ? profile.FarmName[..128] : profile.FarmName;
         await TenantManager.UpdateAsync(tenant);
 

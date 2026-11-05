@@ -34,6 +34,7 @@ import { FPMS_IMPORTS } from '../shared-imports';
                             <div class="card-header"><h3 class="card-title"><i class="fas fa-warehouse" aria-hidden="true"></i>Farm details</h3></div>
                             <div class="card-body">
                                 <dl class="row mb-0 fpms-dl">
+                                    <dt class="col-sm-4">Farm code</dt><dd class="col-sm-8">{{ p.farmCode || '—' }}</dd>
                                     <dt class="col-sm-4">Farm name</dt><dd class="col-sm-8">{{ p.farmName }}</dd>
                                     <dt class="col-sm-4">Total farm area</dt>
                                     <dd class="col-sm-8">
@@ -80,7 +81,12 @@ import { FPMS_IMPORTS } from '../shared-imports';
                                     <div class="card-header"><h3 class="card-title"><i class="fas fa-warehouse" aria-hidden="true"></i>Farm details</h3></div>
                                     <div class="card-body">
                                         <div class="form-row">
-                                            <div class="form-group col-md-8">
+                                            <div class="form-group col-md-3">
+                                                <label for="farmCode">Farm code <span class="text-danger">*</span></label>
+                                                <input id="farmCode" class="form-control" name="farmCode" [(ngModel)]="p.farmCode" required maxlength="64" pattern="^[a-zA-Z][a-zA-Z0-9_-]{1,63}$" autocapitalize="characters" />
+                                                <small class="form-text text-muted">This also serves as the farm login code.</small>
+                                            </div>
+                                            <div class="form-group col-md-5">
                                                 <label for="farmName">Farm name <span class="text-danger">*</span></label>
                                                 <input id="farmName" class="form-control" name="farmName" [(ngModel)]="p.farmName" required maxlength="150" />
                                             </div>
