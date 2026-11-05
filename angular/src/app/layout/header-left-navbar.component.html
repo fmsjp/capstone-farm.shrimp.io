@@ -1,0 +1,21 @@
+<ul class="navbar-nav">
+    <li class="nav-item fpms-hamburger">
+        <a class="nav-link" href="javascript:;" (click)="toggleSidebar()" aria-label="Toggle navigation">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+        </a>
+    </li>
+    <li class="nav-item d-none d-sm-inline-block">
+        <nav class="fpms-crumbs" aria-label="Breadcrumb">
+            <ol>
+                @for (c of crumbs(); track $index; let last = $last) {
+                    <li [class.fpms-crumb-farm]="$first" [class.fpms-crumb-host]="isHost && $first">
+                        @if (isHost && $first) {
+                            <i class="fas fa-shield-alt mr-1" aria-hidden="true"></i>
+                        }
+                        <span [attr.aria-current]="last ? 'page' : null">{{ c }}</span>
+                    </li>
+                }
+            </ol>
+        </nav>
+    </li>
+</ul>

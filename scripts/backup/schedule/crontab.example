@@ -1,0 +1,12 @@
+SHELL=/bin/bash
+FPMS_SQL_MODE=local
+FPMS_DB=FPMS
+FPMS_BACKUP_ROOT=/media/fpms-backup
+FPMS_OFFSITE_DIR=/media/fpms-offsite
+
+*/30 * * * *  cd /opt/fpms && . /etc/fpms/backup.env && bash scripts/backup/backup-log.sh      >> /var/log/fpms-backup.log 2>&1
+0 20 * * *    cd /opt/fpms && . /etc/fpms/backup.env && bash scripts/backup/backup.sh          >> /var/log/fpms-backup.log 2>&1
+45 20 * * *   cd /opt/fpms && . /etc/fpms/backup.env && bash scripts/backup/retention.sh       >> /var/log/fpms-backup.log 2>&1
+0 21 * * 0    cd /opt/fpms && . /etc/fpms/backup.env && bash scripts/backup/integrity-check.sh >> /var/log/fpms-backup.log 2>&1
+0 22 * * 0    cd /opt/fpms && . /etc/fpms/backup.env && bash scripts/backup/offsite-copy.sh    >> /var/log/fpms-backup.log 2>&1
+0 21 1 1,4,7,10 * cd /opt/fpms && . /etc/fpms/backup.env && bash scripts/backup/restore-test.sh >> /var/log/fpms-backup.log 2>&1

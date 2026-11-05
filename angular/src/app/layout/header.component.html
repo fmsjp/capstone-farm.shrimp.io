@@ -1,0 +1,9 @@
+<nav class="main-header navbar navbar-expand navbar-white navbar-light no-print" [class.fpms-host-header]="isHost">
+    <header-left-navbar></header-left-navbar>
+    <ul class="navbar-nav ml-auto align-items-center">
+        <header-clock></header-clock>
+        @if (!isHost) {
+            <header-notifications></header-notifications>
+        }
+    </ul>
+</nav>

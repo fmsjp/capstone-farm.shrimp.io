@@ -1,0 +1,149 @@
+<div [@routerTransition]>
+    <h4 class="text-center mb-3">Register a farm account</h4>
+    @if (enabled() === false) {
+        <div class="alert alert-info">
+            Farm registration is currently disabled. Contact the System Administrator to open registration for your farm.
+        </div>
+        <a [routerLink]="['../login']"><i class="fas fa-arrow-left mr-1"></i>Back to sign in</a>
+    }
+    @if (enabled()) {
+        <div class="fpms-steps mb-3" aria-label="Registration steps">
+            <span [class.active]="step() === 1">1 Farm</span>
+            <span [class.active]="step() === 2">2 Owner account</span>
+            <span [class.active]="step() === 3">3 Review</span>
+        </div>
+        <form #f="ngForm" novalidate autocomplete="off">
+            @if (step() === 1) {
+                <div class="form-group">
+                    <label for="farmName">Farm name <span class="text-danger">*</span></label>
+                    <input id="farmName" class="form-control" name="farmName" [(ngModel)]="model.farmName" (blur)="suggestFarmCode()" required maxlength="150" />
+                </div>
+                <div class="form-group">
+                    <label for="farmCode">Farm code <span class="text-danger">*</span></label>
+                    <input id="farmCode" class="form-control" name="farmCode" [(ngModel)]="model.farmCode" (ngModelChange)="farmCodeEdited = !!$event" required maxlength="64" pattern="^[a-zA-Z][a-zA-Z0-9_-]{1,63}$" autocapitalize="characters" #code="ngModel" />
+                    <small class="form-text text-muted">
+                        Used at sign-in. Filled in from the farm name, e.g. <code>GENSAN-SEMI</code>; you can change it before saving.
+                    </small>
+                    @if (code.invalid && code.touched) {
+                        <small class="text-danger">Start with a letter; 2–64 characters: letters, digits, - and _.</small>
+                    }
+                </div>
+                <fieldset class="mb-2">
+                    <legend class="h6 mb-2">Farm address</legend>
+                    <div class="form-group">
+                        <label for="line1">Address line 1 <span class="text-danger">*</span></label>
+                        <input id="line1" class="form-control" name="addressLine1" [(ngModel)]="model.addressLine1" required maxlength="200" placeholder="House no., street, purok or sitio" />
+                    </div>
+                    <div class="form-group">
+                        <label for="line2">Address line 2</label>
+                        <input id="line2" class="form-control" name="addressLine2" [(ngModel)]="model.addressLine2" maxlength="200" placeholder="Building, floor, or barangay" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="city">City / Municipality <span class="text-danger">*</span></label>
+                            <input id="city" class="form-control" name="cityMunicipality" [(ngModel)]="model.cityMunicipality" required maxlength="100" />
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="province">Province <span class="text-danger">*</span></label>
+                            <input id="province" class="form-control" name="province" [(ngModel)]="model.province" required maxlength="100" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-5">
+                            <label for="postal">Postal code</label>
+                            <input id="postal" class="form-control" name="postalCode" [(ngModel)]="model.postalCode" maxlength="10" inputmode="numeric" />
+                            @if (!postalOk) {
+                                <small class="text-danger">4 digits, e.g. 9502.</small>
+                            }
+                        </div>
+                        <div class="form-group col-7">
+                            <label for="country">Country <span class="text-danger">*</span></label>
+                            <input id="country" class="form-control" name="country" [(ngModel)]="model.country" required maxlength="100" />
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    <label for="area">Total farm area (hectares)</label>
+                    <input id="area" type="number" min="0.01" max="100000" step="0.01" class="form-control" name="totalAreaHectares" [(ngModel)]="model.totalAreaHectares" />
+                    <small class="form-text text-muted">Optional. You can add or correct it later on the farm profile.</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="contactName">Contact person</label>
+                        <input id="contactName" class="form-control" name="contactName" [(ngModel)]="model.contactName" maxlength="100" />
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="contactPhone">Phone</label>
+                        <input id="contactPhone" class="form-control" name="contactPhone" [(ngModel)]="model.contactPhone" maxlength="50" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Contact email</label>
+                    <input id="contactEmail" type="email" email class="form-control" name="contactEmail" [(ngModel)]="model.contactEmail" maxlength="256" #cemail="ngModel" />
+                    <small class="form-text text-muted">Optional. You can add or correct it later on the farm profile.</small>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" [disabled]="!model.farmCode || !model.farmName || !addressComplete || !!code.invalid || !!cemail.invalid" (click)="wizard.go(2)">Next</button>
+            }
+            @if (step() === 2) {
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="ownerName">First name <span class="text-danger">*</span></label>
+                        <input id="ownerName" class="form-control" name="ownerName" [(ngModel)]="model.ownerName" (blur)="suggestOwnerUserName()" required maxlength="64" />
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="ownerSurname">Surname <span class="text-danger">*</span></label>
+                        <input id="ownerSurname" class="form-control" name="ownerSurname" [(ngModel)]="model.ownerSurname" (blur)="suggestOwnerUserName()" required maxlength="64" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ownerUserName">Username <span class="text-danger">*</span></label>
+                    <input id="ownerUserName" class="form-control" name="ownerUserName" [(ngModel)]="model.ownerUserName" (ngModelChange)="ownerUserNameEdited = !!$event" required maxlength="256" autocapitalize="off" />
+                    <small class="form-text text-muted">Filled in from your name, e.g. <code>jdelacruz</code>; you can change it.</small>
+                </div>
+                <div class="form-group">
+                    <label for="ownerEmail">Email <span class="text-danger">*</span></label>
+                    <input id="ownerEmail" type="email" class="form-control" name="ownerEmailAddress" [(ngModel)]="model.ownerEmailAddress" required email maxlength="256" />
+                </div>
+                <div class="form-group">
+                    <label for="ownerPassword">Password <span class="text-danger">*</span></label>
+                    <input id="ownerPassword" type="password" class="form-control" name="ownerPassword" [(ngModel)]="model.ownerPassword" required minlength="8" />
+                    <small class="form-text text-muted">At least 8 characters with upper- and lower-case letters and a digit.</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirm">Confirm password <span class="text-danger">*</span></label>
+                    <input id="confirm" type="password" class="form-control" name="confirm" [(ngModel)]="confirmPassword" required />
+                    @if (confirmPassword && !passwordsMatch) {
+                        <small class="text-danger">Passwords do not match.</small>
+                    }
+                </div>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-default mr-2" (click)="wizard.go(1)">Back</button>
+                    <button type="button" class="btn btn-primary flex-grow-1" [disabled]="!model.ownerName || !model.ownerSurname || !model.ownerUserName || !model.ownerEmailAddress || model.ownerPassword.length < 8 || !passwordsMatch" (click)="wizard.go(3)">Review</button>
+                </div>
+            }
+            @if (step() === 3) {
+                <dl class="row small mb-3">
+                    <dt class="col-5">Farm code</dt><dd class="col-7">{{ model.farmCode }}</dd>
+                    <dt class="col-5">Farm name</dt><dd class="col-7">{{ model.farmName }}</dd>
+                    <dt class="col-5">Address</dt><dd class="col-7">{{ fullAddress }}</dd>
+                    @if (model.totalAreaHectares) {
+                        <dt class="col-5">Total area</dt><dd class="col-7">{{ model.totalAreaHectares }} ha</dd>
+                    }
+                    <dt class="col-5">Farm Owner</dt><dd class="col-7">{{ model.ownerName }} {{ model.ownerSurname }} ({{ model.ownerUserName }})</dd>
+                    <dt class="col-5">Email</dt><dd class="col-7">{{ model.ownerEmailAddress }}</dd>
+                </dl>
+                <p class="small text-muted">You can record permits and their expiry dates after registration from Farm › Compliance documents.</p>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-default mr-2" (click)="wizard.go(2)">Back</button>
+                    <button type="button" class="btn btn-primary flex-grow-1" [disabled]="saving()" (click)="submit()">
+                        @if (saving()) {
+                            <i class="fas fa-spinner fa-spin mr-1"></i>
+                        }
+                        Create farm account
+                    </button>
+                </div>
+            }
+        </form>
+        <p class="mt-3 mb-0"><a [routerLink]="['../login']">Already registered? Sign in</a></p>
+    }
+</div>

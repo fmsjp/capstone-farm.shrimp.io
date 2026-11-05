@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "https://localhost:44311",
+    "secure": false
+  },
+  "/AbpUserConfiguration": {
+    "target": "https://localhost:44311",
+    "secure": false
+  },
+  "/signalr": {
+    "target": "https://localhost:44311",
+    "secure": false,
+    "ws": true
+  }
+}

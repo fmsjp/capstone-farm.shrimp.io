@@ -1,0 +1,13 @@
+<div class="wrapper">
+    <app-header></app-header>
+    <fpms-progress></fpms-progress>
+    <sidebar></sidebar>
+    <div class="content-wrapper">
+        <fpms-health-banner></fpms-health-banner>
+        <fpms-section-tabs></fpms-section-tabs>
+        <router-outlet></router-outlet>
+    </div>
+    <app-footer></app-footer>
+    <fpms-log-drawer></fpms-log-drawer>
+    <div id="sidebar-overlay" (click)="toggleSidebar()"></div>
+</div>

@@ -1,0 +1,20 @@
+﻿using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore;
+using Abp.MultiTenancy;
+using Abp.Zero.EntityFrameworkCore;
+
+namespace Capstone.EntityFrameworkCore;
+
+public class AbpZeroDbMigrator : AbpZeroDbMigrator<CapstoneDbContext>
+{
+    public AbpZeroDbMigrator(
+        IUnitOfWorkManager unitOfWorkManager,
+        IDbPerTenantConnectionStringResolver connectionStringResolver,
+        IDbContextResolver dbContextResolver)
+        : base(
+            unitOfWorkManager,
+            connectionStringResolver,
+            dbContextResolver)
+    {
+    }
+}
